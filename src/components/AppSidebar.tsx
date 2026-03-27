@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useRole } from '@/contexts/RoleContext';
+import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, FileText, Upload, MessageSquare, MessageCircle,
@@ -34,10 +34,10 @@ const navConfig = {
 };
 
 export const AppSidebar = () => {
-  const { role } = useRole();
+  const { role } = useAuth();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const items = navConfig[role];
+  const items = navConfig[role as keyof typeof navConfig] || [];
 
   const nav = (
     <nav className="flex flex-col gap-1 p-3">
