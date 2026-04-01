@@ -12,9 +12,9 @@ import {
   QueryConstraint,
   onSnapshot,
 } from 'firebase/firestore';
-import { db, storage } from './firebase';
+import { db } from './firebase';
 import { Submission, SubmissionStatus } from '@/data/mockData';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { uploadFile } from './supabase';
 
 /**
  * Create a new submission
@@ -26,18 +26,16 @@ export const createSubmission = async (
   try {
     let fileUrl: string | undefined;
 
-    // Upload file to storage if provided
+    // Upload file to Supabase Storage if provided
     if (file) {
-      const fileName = `${data.studentId}/${data.projectId}/${Date.now()}_${file.name}`;
-      const storageRef = ref(storage, `submissions/${fileName}`);
-      await uploadBytes(storageRef, file);
-      fileUrl = await getDownloadURL(storageRef);
+      fileUrl = await uploadFile(file, data.studentId);
     }
 
     const submissionsRef = collection(db, 'submissions');
     const docRef = await addDoc(submissionsRef, {
       ...data,
       fileUrl,
+      fileName: file?.name,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });
